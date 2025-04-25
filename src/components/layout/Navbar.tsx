@@ -1,91 +1,64 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Bell, MessageSquare, Search, User } from "lucide-react";
-import { cn } from '@/lib/utils';
 
 const Navbar = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-sm border-b border-gray-100">
+    <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-6">
-          <Link to="/" className="flex items-center">
-            <div className="w-8 h-8 rounded-md bg-gradient-to-r from-primary-purple to-secondary-purple flex items-center justify-center text-white font-bold mr-2">CB</div>
-            <span className="text-xl font-bold">CareerBloom</span>
+        <div className="flex gap-6 md:gap-10">
+          <Link to="/" className="flex items-center space-x-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-6 w-6"
+            >
+              <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
+            </svg>
+            <span className="hidden font-bold sm:inline-block">
+              CareerBloom
+            </span>
           </Link>
-          
-          <nav className="hidden md:flex items-center gap-6">
-            <Link to="/jobs" className="text-sm font-medium hover:text-primary-purple transition-colors">Jobs</Link>
-            <Link to="/companies" className="text-sm font-medium hover:text-primary-purple transition-colors">Companies</Link>
-            <Link to="/network" className="text-sm font-medium hover:text-primary-purple transition-colors">Network</Link>
-            <Link to="/learning" className="text-sm font-medium hover:text-primary-purple transition-colors">Learning</Link>
+          <nav className="flex gap-6">
+            <Link
+              to="/"
+              className="flex items-center text-lg font-medium transition-colors hover:text-foreground/80 sm:text-sm"
+            >
+              Home
+            </Link>
+            <Link
+              to="/jobs"
+              className="flex items-center text-lg font-medium transition-colors hover:text-foreground/80 sm:text-sm"
+            >
+              Jobs
+            </Link>
+            <Link
+              to="/companies"
+              className="flex items-center text-lg font-medium transition-colors hover:text-foreground/80 sm:text-sm"
+            >
+              Companies
+            </Link>
+            <Link
+              to="/dashboard"
+              className="flex items-center text-lg font-medium transition-colors hover:text-foreground/80 sm:text-sm"
+            >
+              Dashboard
+            </Link>
           </nav>
         </div>
-
-        <div className="hidden md:flex items-center gap-4">
-          <Button variant="outline" size="icon" className="rounded-full">
-            <Search className="h-5 w-5" />
-            <span className="sr-only">Search</span>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/signin">Sign In</Link>
           </Button>
-          <Button variant="outline" size="icon" className="rounded-full">
-            <MessageSquare className="h-5 w-5" />
-            <span className="sr-only">Messages</span>
-          </Button>
-          <Button variant="outline" size="icon" className="rounded-full">
-            <Bell className="h-5 w-5" />
-            <span className="sr-only">Notifications</span>
-          </Button>
-          <Button variant="outline" size="icon" className="rounded-full">
-            <User className="h-5 w-5" />
-            <span className="sr-only">Profile</span>
-          </Button>
-          <Button className="btn-gradient rounded-md">
-            Sign In
+          <Button size="sm" asChild>
+            <Link to="/signup">Sign Up</Link>
           </Button>
         </div>
-
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="md:hidden"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          <span className="sr-only">Toggle menu</span>
-        </Button>
-      </div>
-
-      {/* Mobile menu */}
-      <div className={cn(
-        "md:hidden absolute w-full bg-white border-b border-gray-100 transition-all duration-200 ease-in-out", 
-        mobileMenuOpen ? "max-h-screen py-4" : "max-h-0 overflow-hidden"
-      )}>
-        <nav className="container flex flex-col gap-4">
-          <Link to="/jobs" className="text-sm font-medium hover:text-primary-purple transition-colors p-2">Jobs</Link>
-          <Link to="/companies" className="text-sm font-medium hover:text-primary-purple transition-colors p-2">Companies</Link>
-          <Link to="/network" className="text-sm font-medium hover:text-primary-purple transition-colors p-2">Network</Link>
-          <Link to="/learning" className="text-sm font-medium hover:text-primary-purple transition-colors p-2">Learning</Link>
-          <div className="flex items-center gap-2 mt-2">
-            <Button variant="outline" size="icon" className="rounded-full">
-              <Search className="h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="icon" className="rounded-full">
-              <MessageSquare className="h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="icon" className="rounded-full">
-              <Bell className="h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="icon" className="rounded-full">
-              <User className="h-5 w-5" />
-            </Button>
-          </div>
-          <Button className="btn-gradient rounded-md mt-2">
-            Sign In
-          </Button>
-        </nav>
       </div>
     </header>
   );
