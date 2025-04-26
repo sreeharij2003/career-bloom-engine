@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend, LineChart, Line } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart4, Layers, Award, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const progressData = [
   { milestone: "Network Growth", completed: 85, total: 100 },
@@ -184,11 +184,7 @@ const ProgressDashboard = () => {
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
                       <YAxis />
-                      <ChartTooltip 
-                        content={(props) => (
-                          <ChartTooltipContent {...props} />
-                        )} 
-                      />
+                      <Tooltip content={<ChartTooltipContent />} />
                       <Legend />
                       <Bar dataKey="user" fill="#8884d8" name="Your Skills" />
                       <Bar dataKey="industry" fill="#82ca9d" name="Industry Benchmark" />
@@ -217,11 +213,7 @@ const ProgressDashboard = () => {
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
                       <YAxis />
-                      <ChartTooltip 
-                        content={(props) => (
-                          <ChartTooltipContent {...props} />
-                        )} 
-                      />
+                      <Tooltip content={<ChartTooltipContent />} />
                       <Legend />
                       <Line type="monotone" dataKey="applications" stroke="#8884d8" activeDot={{ r: 8 }} />
                       <Line type="monotone" dataKey="interviews" stroke="#82ca9d" />
