@@ -6,6 +6,7 @@ import { connectDB } from './config/db';
 import authRoutes from './routes/auth.routes';
 import careerRoutes from './routes/career.routes';
 import jobRoutes from './routes/job.routes';
+import { startScrapingSchedule } from './controllers/job.controller';
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +31,9 @@ app.use('/api/jobs', jobRoutes);
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
+
+// Start job scraping schedule
+startScrapingSchedule();
 
 // Start server
 app.listen(PORT, () => {

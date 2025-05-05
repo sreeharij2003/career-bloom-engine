@@ -4,14 +4,14 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { Briefcase, MapPin, Building, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchJobs } from "@/services/jobsService";
+import { fetchFeaturedJobs } from "@/services/jobsService";
 import type { JobListing } from "@/types/jobs";
 
 const FeaturedJobs = () => {
   const { data: jobs = [], isLoading, error } = useQuery({
     queryKey: ['featuredJobs'],
-    queryFn: () => fetchJobs(),
-    select: (data) => data.slice(0, 4), // Only show first 4 jobs
+    queryFn: fetchFeaturedJobs,
+    refetchInterval: 1000 * 60 * 60, // Refetch every hour
   });
 
   return (

@@ -1,7 +1,120 @@
 
 import { JobListing, JobFilters } from "@/types/jobs";
+import { API_BASE_URL } from "./api";
 
-// Mock data - this would be replaced with actual API calls to your backend
+// Real API calls to fetch jobs
+export const fetchJobs = async (filters?: JobFilters): Promise<JobListing[]> => {
+  console.log("Fetching jobs with filters:", filters);
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/jobs`);
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching jobs: ${response.statusText}`);
+    }
+    
+    const jobs = await response.json();
+    return filterJobs(jobs, filters);
+  } catch (error) {
+    console.error("Error fetching jobs:", error);
+    // Fallback to mock data if API fails
+    return filterJobs(mockJobs, filters);
+  }
+};
+
+export const fetchFeaturedJobs = async (): Promise<JobListing[]> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/jobs/featured`);
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching featured jobs: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching featured jobs:", error);
+    // Fallback to mock data if API fails
+    return mockJobs.slice(0, 4);
+  }
+};
+
+export const searchJobs = async (searchTerm: string, filters?: JobFilters): Promise<JobListing[]> => {
+  console.log(`Searching for "${searchTerm}" with filters:`, filters);
+  
+  try {
+    // For now, we'll handle search on the client side as we don't have a dedicated search endpoint
+    const allJobs = await fetchJobs();
+    
+    // Filter the jobs based on the search term
+    const searchResults = allJobs.filter(job => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        job.title.toLowerCase().includes(searchLower) ||
+        job.company.toLowerCase().includes(searchLower) ||
+        job.description.toLowerCase().includes(searchLower) ||
+        job.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+      );
+    });
+    
+    // Apply additional filters
+    return filterJobs(searchResults, filters);
+  } catch (error) {
+    console.error("Error searching jobs:", error);
+    return [];
+  }
+};
+
+// Helper function to apply filters
+const filterJobs = (jobs: JobListing[], filters?: JobFilters): JobListing[] => {
+  if (!filters) return jobs;
+  
+  return jobs.filter(job => {
+    // Filter by location if provided
+    if (filters.location && 
+        !job.location.toLowerCase().includes(filters.location.toLowerCase())) {
+      return false;
+    }
+    
+    // Filter by job type if any are selected
+    if (filters.jobType && filters.jobType.length > 0) {
+      const normalizedType = job.type.toLowerCase();
+      const matchesType = filters.jobType.some(type => 
+        normalizedType.includes(type.toLowerCase())
+      );
+      if (!matchesType) return false;
+    }
+    
+    // Filter by industry if any are selected (using tags as proxy for industry)
+    if (filters.industry && filters.industry.length > 0 && job.tags) {
+      const matchesIndustry = filters.industry.some(industry =>
+        job.tags!.some(tag => tag.toLowerCase().includes(industry.toLowerCase()))
+      );
+      if (!matchesIndustry) return false;
+    }
+    
+    return true;
+  });
+};
+
+// Trigger a manual scrape - this would be called by an admin user
+export const triggerJobScrape = async (): Promise<{ message: string, count: number }> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/jobs/scrape`, {
+      method: 'POST',
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error triggering job scrape: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error("Error triggering job scrape:", error);
+    throw error;
+  }
+};
+
+// Mock data as fallback if API fails
 const mockJobs: JobListing[] = [
   {
     id: 1,
@@ -87,76 +200,3 @@ const mockJobs: JobListing[] = [
     source: "Glassdoor"
   }
 ];
-
-// In a real implementation, these functions would call your backend API
-export const fetchJobs = async (filters?: JobFilters): Promise<JobListing[]> => {
-  console.log("Fetching jobs with filters:", filters);
-  
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  // This filtering would happen on the backend in a real implementation
-  return filterJobs(mockJobs, filters);
-};
-
-export const searchJobs = async (searchTerm: string, filters?: JobFilters): Promise<JobListing[]> => {
-  console.log(`Searching for "${searchTerm}" with filters:`, filters);
-  
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  // Filter the mock jobs based on the search term
-  const searchResults = mockJobs.filter(job => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      job.title.toLowerCase().includes(searchLower) ||
-      job.company.toLowerCase().includes(searchLower) ||
-      job.description.toLowerCase().includes(searchLower) ||
-      job.tags?.some(tag => tag.toLowerCase().includes(searchLower))
-    );
-  });
-  
-  // Apply additional filters
-  return filterJobs(searchResults, filters);
-};
-
-// Helper function to apply filters
-const filterJobs = (jobs: JobListing[], filters?: JobFilters): JobListing[] => {
-  if (!filters) return jobs;
-  
-  return jobs.filter(job => {
-    // Filter by location if provided
-    if (filters.location && 
-        !job.location.toLowerCase().includes(filters.location.toLowerCase())) {
-      return false;
-    }
-    
-    // Filter by job type if any are selected
-    if (filters.jobType && filters.jobType.length > 0) {
-      const normalizedType = job.type.toLowerCase();
-      const matchesType = filters.jobType.some(type => 
-        normalizedType.includes(type.toLowerCase())
-      );
-      if (!matchesType) return false;
-    }
-    
-    // Filter by industry if any are selected (using tags as proxy for industry)
-    if (filters.industry && filters.industry.length > 0 && job.tags) {
-      const matchesIndustry = filters.industry.some(industry =>
-        job.tags!.some(tag => tag.toLowerCase().includes(industry.toLowerCase()))
-      );
-      if (!matchesIndustry) return false;
-    }
-    
-    // Filtering by experience level would require that field in the data
-    
-    return true;
-  });
-};
-
-// For a real implementation, we'd need a function to refresh the job data from the backend
-export const refreshJobData = async (): Promise<void> => {
-  console.log("Triggering backend job data refresh");
-  // This would call an endpoint that initiates web scraping on the backend
-  await fetch('/api/jobs/refresh', { method: 'POST' });
-};
