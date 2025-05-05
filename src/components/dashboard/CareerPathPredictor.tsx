@@ -4,10 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { toast } from "sonner";
-import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
-
-// API URL - would come from environment variables in production
-const API_URL = "http://localhost:5000/api";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { API } from "@/services/api";
 
 interface CareerStep {
   year: number;
@@ -24,108 +22,35 @@ interface CareerPathResponse {
   createdAt: string;
 }
 
-// This would be a proper auth token from your auth context in a real app
-const getAuthToken = () => localStorage.getItem('authToken') || 'demo-token';
-
 const CareerPathPredictor = () => {
   const [query, setQuery] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
   
-  // Use this to invalidate queries when new data is created
-  const queryClient = new QueryClient();
-
-  // Fetch the most recent career path if it exists
-  const { data: roadmap, isLoading } = useQuery({
+  // Fetch the most recent career path
+  const { data: roadmap, isLoading, refetch } = useQuery({
     queryKey: ['careerPath'],
     queryFn: async (): Promise<CareerPathResponse | null> => {
       try {
-        // In a real implementation, this would call the API to get the most recent path
-        // const response = await fetch(`${API_URL}/career/paths?limit=1`, {
-        //   headers: {
-        //     'Authorization': `Bearer ${getAuthToken()}`
-        //   }
-        // });
-        // const data = await response.json();
-        // return data.length > 0 ? data[0] : null;
-        
-        // For demo, we'll return mock data similar to what we had before
-        return null;
+        const paths = await API.career.getUserCareerPaths();
+        return paths.length > 0 ? paths[0] : null;
       } catch (error) {
         console.error("Error fetching career path:", error);
         return null;
       }
     },
-    enabled: false, // Initially disabled, we'll manually trigger it
   });
 
   // Create a career path
   const generateMutation = useMutation({
     mutationFn: async (queryText: string): Promise<CareerPathResponse> => {
-      // In a real implementation, this would call the API
-      // const response = await fetch(`${API_URL}/career/path`, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${getAuthToken()}`
-      //   },
-      //   body: JSON.stringify({ query: queryText })
-      // });
-      
-      // if (!response.ok) {
-      //   throw new Error('Failed to generate career path');
-      // }
-      
-      // return response.json();
-      
-      // For demo purposes, we'll simulate an API call with the existing mock data
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      return {
-        _id: "mock-id-" + Date.now(),
-        title: "Path to CTO in 5 Years",
-        query: queryText,
-        steps: [
-          {
-            year: 1,
-            title: "Senior Developer to Team Lead",
-            description: "Focus on leadership skills while maintaining technical expertise. Lead small teams on projects and mentor junior developers.",
-            skills: ["Leadership", "Technical mentoring", "Project management"]
-          },
-          {
-            year: 2,
-            title: "Engineering Manager",
-            description: "Oversee multiple teams and be responsible for technical direction. Start focusing on cross-departmental collaboration.",
-            skills: ["People management", "Technical strategy", "Cross-team collaboration"]
-          },
-          {
-            year: 3,
-            title: "Director of Engineering",
-            description: "Develop broader technical vision and manage engineering department budget and resources.",
-            skills: ["Technical vision", "Resource allocation", "Budget management"]
-          },
-          {
-            year: 4,
-            title: "VP of Engineering",
-            description: "Take on company-wide technical leadership and represent engineering in executive discussions.",
-            skills: ["Executive communication", "Strategic planning", "Technology roadmapping"]
-          },
-          {
-            year: 5,
-            title: "Chief Technology Officer",
-            description: "Lead the overall technology strategy and innovation direction for the company.",
-            skills: ["Technology innovation", "Executive leadership", "Business strategy"]
-          }
-        ],
-        createdAt: new Date().toISOString()
-      };
+      return await API.career.generateCareerPath(queryText);
     },
     onSuccess: () => {
-      // Invalidate the query to refetch the data
-      queryClient.invalidateQueries({ queryKey: ['careerPath'] });
+      // Refetch to get the latest data
+      refetch();
       toast.success("Career roadmap generated!");
     },
     onError: (error) => {
-      toast.error("Failed to generate roadmap: " + error.message);
+      toast.error("Failed to generate roadmap: " + (error as Error).message);
       console.error(error);
     }
   });
@@ -138,12 +63,10 @@ const CareerPathPredictor = () => {
       return;
     }
     
-    setIsGenerating(true);
-    
     try {
-      await generateMutation.mutateAsync(query);
-    } finally {
-      setIsGenerating(false);
+      generateMutation.mutate(query);
+    } catch (error) {
+      console.error("Error generating career path:", error);
     }
   };
 
@@ -158,10 +81,10 @@ const CareerPathPredictor = () => {
         />
         <Button 
           type="submit" 
-          disabled={isGenerating || isLoading}
+          disabled={generateMutation.isPending || isLoading}
         >
-          {isGenerating ? "Generating..." : <Search className="mr-2" />}
-          {isGenerating ? "" : "Generate"}
+          {generateMutation.isPending ? "Generating..." : <Search className="mr-2" />}
+          {generateMutation.isPending ? "" : "Generate"}
         </Button>
       </form>
 
