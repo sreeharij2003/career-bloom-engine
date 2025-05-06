@@ -10,7 +10,7 @@ import SkillGapAnalyzer from "@/components/dashboard/SkillGapAnalyzer";
 import ProgressDashboard from "@/components/dashboard/ProgressDashboard";
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState("career-path");
+  const [activeTab, setActiveTab] = useState("skill-gap");
 
   return (
     <MainLayout>
@@ -22,7 +22,7 @@ const Dashboard = () => {
           </p>
         </div>
         
-        <Tabs defaultValue="career-path" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs defaultValue="skill-gap" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2">
             <TabsTrigger value="career-path">Career Path</TabsTrigger>
             <TabsTrigger value="connections">Connections</TabsTrigger>
@@ -78,7 +78,7 @@ const Dashboard = () => {
               <CardHeader>
                 <CardTitle>Skill Gap Analyzer</CardTitle>
                 <CardDescription>
-                  Identify and bridge skill gaps with personalized learning recommendations
+                  Upload your resume and job descriptions to identify missing skills and get personalized recommendations
                 </CardDescription>
               </CardHeader>
               <CardContent>
