@@ -10,7 +10,7 @@ import SkillGapAnalyzer from "@/components/dashboard/SkillGapAnalyzer";
 import ProgressDashboard from "@/components/dashboard/ProgressDashboard";
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState("skill-gap");
+  const [activeTab, setActiveTab] = useState("resume");
 
   return (
     <MainLayout>
@@ -22,7 +22,7 @@ const Dashboard = () => {
           </p>
         </div>
         
-        <Tabs defaultValue="skill-gap" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs defaultValue="resume" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2">
             <TabsTrigger value="career-path">Career Path</TabsTrigger>
             <TabsTrigger value="connections">Connections</TabsTrigger>
@@ -64,7 +64,7 @@ const Dashboard = () => {
               <CardHeader>
                 <CardTitle>AI-Powered Resume Builder</CardTitle>
                 <CardDescription>
-                  Automatically tailor your resume for specific job opportunities
+                  Create, edit and export your professional resume with customizable sections
                 </CardDescription>
               </CardHeader>
               <CardContent>
