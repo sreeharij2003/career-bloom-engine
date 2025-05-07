@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { 
   Download, FileText, User, Phone, Mail, Linkedin, BookOpen, 
-  GraduationCap, Briefcase, Award, Language, Star, Plus, Trash2, 
+  GraduationCap, Briefcase, Award, Languages, Star, Plus, Trash2, 
   Move, Save, FileUp, Eye, HelpCircle
 } from "lucide-react";
 import { toast } from "sonner";
@@ -211,7 +210,7 @@ const sectionsList: SectionMetadata[] = [
   {
     id: "languages",
     title: "Languages",
-    icon: Language,
+    icon: Languages,
     required: false,
     description: "Language proficiencies",
     helpText: "Indicate your level of proficiency for each language."
@@ -1638,4 +1637,3 @@ const ResumeBuilder = () => {
 };
 
 export default ResumeBuilder;
-
