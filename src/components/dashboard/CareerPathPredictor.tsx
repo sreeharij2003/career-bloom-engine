@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Route } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { API } from "@/services/api";
@@ -26,7 +26,7 @@ const CareerPathPredictor = () => {
   const [query, setQuery] = useState("");
   
   // Fetch the most recent career path
-  const { data: roadmap, isLoading, refetch } = useQuery({
+  const { data: roadmap, isLoading, refetch, isError } = useQuery({
     queryKey: ['careerPath'],
     queryFn: async (): Promise<CareerPathResponse | null> => {
       try {
@@ -63,12 +63,28 @@ const CareerPathPredictor = () => {
       return;
     }
     
+    if (!localStorage.getItem('token')) {
+      toast.error("Please log in to generate a career path");
+      return;
+    }
+    
     try {
       generateMutation.mutate(query);
     } catch (error) {
       console.error("Error generating career path:", error);
     }
   };
+
+  if (isError) {
+    return (
+      <div className="p-6 bg-muted/50 rounded-lg text-center">
+        <Route className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <h3 className="text-xl font-medium mb-2">Couldn't load career paths</h3>
+        <p className="text-muted-foreground mb-4">There was an error loading your career paths.</p>
+        <Button onClick={() => refetch()}>Try Again</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -87,6 +103,12 @@ const CareerPathPredictor = () => {
           {generateMutation.isPending ? "" : "Generate"}
         </Button>
       </form>
+
+      {isLoading && (
+        <div className="flex items-center justify-center p-8">
+          <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full"></div>
+        </div>
+      )}
 
       {(roadmap || generateMutation.data) && (
         <div className="mt-6 space-y-4">
@@ -117,6 +139,14 @@ const CareerPathPredictor = () => {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {!isLoading && !roadmap && !generateMutation.data && (
+        <div className="p-6 bg-muted/50 rounded-lg text-center">
+          <Route className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-xl font-medium mb-2">No career paths yet</h3>
+          <p className="text-muted-foreground">Use the form above to generate your first career path roadmap.</p>
         </div>
       )}
     </div>

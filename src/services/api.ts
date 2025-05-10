@@ -12,6 +12,7 @@ export const API = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({ query }),
       });
@@ -23,10 +24,27 @@ export const API = {
       return response.json();
     },
     getUserCareerPaths: async () => {
-      const response = await fetch(`${API_BASE_URL}/career/paths`);
+      const response = await fetch(`${API_BASE_URL}/career/paths`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+      });
       
       if (!response.ok) {
         throw new Error('Failed to fetch career paths');
+      }
+      
+      return response.json();
+    },
+    getCareerPathById: async (id: string) => {
+      const response = await fetch(`${API_BASE_URL}/career/path/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch career path details');
       }
       
       return response.json();
