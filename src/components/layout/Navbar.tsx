@@ -1,8 +1,20 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    logout();
+    toast.success("Signed out successfully");
+    navigate("/");
+  };
+
   return (
     <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
@@ -43,21 +55,31 @@ const Navbar = () => {
             >
               Companies
             </Link>
-            <Link
-              to="/dashboard"
-              className="flex items-center text-lg font-medium transition-colors hover:text-foreground/80 sm:text-sm"
-            >
-              Dashboard
-            </Link>
+            {isAuthenticated && (
+              <Link
+                to="/dashboard"
+                className="flex items-center text-lg font-medium transition-colors hover:text-foreground/80 sm:text-sm"
+              >
+                Dashboard
+              </Link>
+            )}
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/signin">Sign In</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link to="/signup">Sign Up</Link>
-          </Button>
+          {isAuthenticated ? (
+            <Button variant="outline" size="sm" onClick={handleSignOut}>
+              Sign Out
+            </Button>
+          ) : (
+            <>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/signin">Sign In</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link to="/signup">Sign Up</Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>
