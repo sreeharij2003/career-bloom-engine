@@ -6,7 +6,7 @@ import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { API_BASE_URL } from "@/services/api";
+import { loginUser } from "@/services/mockAuth";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -20,26 +20,15 @@ const SignIn = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to sign in");
-      }
-
+      // Use mock authentication instead of API call
+      const userData = loginUser(email, password);
+      
       // Use the auth context to login
-      login(data.token, {
-        id: data._id,
-        name: data.name,
-        email: data.email,
-        title: data.title || "",
+      login(userData._id, {
+        id: userData._id,
+        name: userData.name,
+        email: userData.email,
+        title: userData.title || "",
       });
       
       // Show success message
